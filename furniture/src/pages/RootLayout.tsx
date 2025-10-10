@@ -8,7 +8,7 @@ function RootLayout() {
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <div className="flex min-h-screen flex-col">
           <Header />
-          <main className="flex-1 pt-16">
+          <main className="mt-16 flex-1">
             <Outlet />
           </main>
           <Footer />
