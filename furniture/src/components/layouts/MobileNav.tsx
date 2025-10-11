@@ -12,16 +12,37 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
+import { useEffect, useState } from "react";
+
 interface MainNavigationProps {
   items?: MainNavItem[];
 }
 function MobileNav({ items }: MainNavigationProps) {
+  const [isDesktop, setIsDesktop] = useState(false);
+  function onChange(event: MediaQueryListEvent) {
+    setIsDesktop(event.matches);
+  }
+  const query = "(min-width: 1024px)";
+  useEffect(() => {
+    const result = matchMedia(query);
+    result.addEventListener("change", onChange);
+    return () => result.removeEventListener("change", onChange);
+  }, [query]);
+
+  if (isDesktop) {
+    return null;
+  }
+
   return (
     <div>
       <div className="lg:hidden">
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="ml-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="ml-4 flex items-center"
+            >
               <Icons.menu aria-hidden="true" />
               <span className="sr-only">Toggle Menu</span>
             </Button>

@@ -54,7 +54,7 @@ export function EmailForm() {
               <FormControl>
                 <Input
                   placeholder="name@gmail.com"
-                  className="pr-15"
+                  className="pr-12"
                   {...field}
                 />
               </FormControl>
@@ -68,6 +68,7 @@ export function EmailForm() {
                 ) : (
                   <Icons.paperPlane className="size-3" aria-hidden="true" />
                 )}
+                <span className="sr-only">Send Email</span>
               </Button>
             </FormItem>
           )}

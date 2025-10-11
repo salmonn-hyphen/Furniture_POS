@@ -5,9 +5,9 @@ import { EmailForm } from "./EmailForm";
 function Footer() {
   return (
     <div className="border-t">
-      <footer className="mx-8 md:mx-4 lg:mx-0">
+      <footer className="ml-4 w-full lg:ml-0">
         <div className="container mx-auto pt-6 pb-8 lg:py-6">
-          <section className="flex flex-col justify-center gap-10 md:flex-row lg:gap-20">
+          <section className="flex flex-col gap-10 lg:flex-row lg:justify-between lg:gap-20">
             <section>
               <Link to="/" className="flex items-center space-x-2">
                 <Icons.logo className="size-6" aria-hidden="true"></Icons.logo>

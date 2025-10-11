@@ -1,5 +1,6 @@
 import { HomeIcon } from "lucide-react";
 import { Menu } from "lucide-react";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 export type IconProps = React.HTMLAttributes<SVGElement>;
 export const Icons = {
   logo: (props: IconProps) => (
@@ -38,4 +39,5 @@ export const Icons = {
       ></path>
     </svg>
   ),
+  exclamation: ExclamationTriangleIcon,
 };

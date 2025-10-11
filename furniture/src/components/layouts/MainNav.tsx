@@ -18,7 +18,7 @@ interface MainNavigationProps {
 
 function MainNav({ items }: MainNavigationProps) {
   return (
-    <div className="hidden gap-6 px-20 lg:flex lg:justify-center">
+    <div className="hidden gap-6 lg:flex">
       <Link to="/" className="flex items-center space-x-2">
         <Icons.logo className="size-7" aria-hidden />
         <span className="inline-block font-bold">{siteConfig.name}</span>
