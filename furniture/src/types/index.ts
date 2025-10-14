@@ -23,3 +23,14 @@ export type Products = {
   inventory: number;
   status: string;
 };
+
+export interface Posts {
+  id: string;
+  author: string;
+  title: string;
+  content: string;
+  image: string;
+  body: string;
+  updated_at: string;
+  tags: string[];
+}
