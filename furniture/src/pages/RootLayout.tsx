@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
-import Header from "../components/layouts/Header";
+import Header from "../components/Layouts/Header";
 import { ThemeProvider } from "../components/theme-provider";
-import Footer from "../components/layouts/Footer";
+import Footer from "../components/Layouts/Footer";
 function RootLayout() {
   return (
     <>

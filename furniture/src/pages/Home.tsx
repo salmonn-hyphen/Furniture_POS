@@ -4,10 +4,10 @@ import Couch from "../data/images/Couch.png";
 import CarouselComponent from "../components/Products/CarouselComponent";
 import { products } from "../data/products";
 import BlogCard from "../components/Blogs/BlogCard";
-import { posts } from "../data/posts";
+import { Posts } from "../data/posts";
 
 function Home() {
-  const simplePosts = posts.slice(0, 3);
+  const simplePosts = Posts.slice(0, 3);
 
   const Title = ({
     title,

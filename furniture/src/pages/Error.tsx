@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import Header from "../components/layouts/Header";
+import Header from "../components/Layouts/Header";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { ThemeProvider } from "../components/theme-provider";
-import Footer from "../components/layouts/Footer";
+import Footer from "../components/Layouts/Footer";
 import { Icons } from "../components/logo";
 
 function Error() {

@@ -66,6 +66,7 @@ function MobileNav({ items }: MainNavigationProps) {
                       {items?.[0].card?.map((item) => (
                         <SheetClose asChild>
                           <Link
+                            key={item.title}
                             to={String(item.href)}
                             className="text-foreground/70"
                           >
@@ -79,7 +80,7 @@ function MobileNav({ items }: MainNavigationProps) {
               </Accordion>
               <div className="mt-2 flex flex-col space-y-2 pb-2">
                 {items?.[0].menu?.map((item) => (
-                  <SheetClose asChild>
+                  <SheetClose key={item.title} asChild>
                     <Link to={String(item.href)} className="">
                       {item.title}
                     </Link>

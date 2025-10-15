@@ -5,7 +5,7 @@ import po4 from "../data/images/post-4.jpg";
 import po5 from "../data/images/post-5.jpg";
 import po6 from "../data/images/post-6.jpg";
 
-export const posts = [
+export const Posts = [
   {
     id: "uuid1",
     author: "John Smith",
