@@ -7,6 +7,21 @@ import p6 from "../data/images/p6.jpg";
 import p7 from "../data/images/p7.jpg";
 import p8 from "../data/images/p8.jpg";
 
+export const filterList = {
+  types: [
+    { id: "uuid1", label: "seating" },
+    { id: "uuid2", label: "lying" },
+    { id: "uuid3", label: "entertainment" },
+    { id: "uuid4", label: "tables" },
+    { id: "uuid5", label: "storage" },
+  ],
+  categories: [
+    { id: "uuid1", label: "Wooden" },
+    { id: "uuid2", label: "Bamboo" },
+    { id: "uuid3", label: "Metal" },
+  ],
+};
+
 export const products = [
   {
     id: "uuid1",

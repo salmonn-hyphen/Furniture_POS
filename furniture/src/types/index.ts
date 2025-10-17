@@ -34,3 +34,8 @@ export interface Posts {
   updated_at: string;
   tags: string[];
 }
+
+export interface Category {
+  id: string;
+  label: string;
+}

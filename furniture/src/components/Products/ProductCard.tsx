@@ -10,6 +10,7 @@ import {
 } from "../ui/card";
 import { AspectRatio } from "../ui/aspect-ratio";
 import { Link } from "react-router";
+import { formatPrice } from "../../lib/utils";
 
 interface productProps {
   products: Products;
@@ -32,10 +33,10 @@ function ProductCard({ products }: productProps) {
         <CardContent className="space-y-1.5 p-4">
           <CardTitle className="line-clamp-1">{products.name}</CardTitle>
           <CardDescription className="line-clamp-1">
-            $ {products.price}
+            {formatPrice(products.price)}
             {products.discount > 0 && (
               <span className="ml-2 font-extralight line-through">
-                $ {products.discount}
+                {formatPrice(products.discount)}
               </span>
             )}
           </CardDescription>
