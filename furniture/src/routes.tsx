@@ -9,6 +9,8 @@ import BlogRootLayout from "./pages/Blog/BlogRootLayout";
 import ProductRootLayout from "./pages/Products/ProductRootLayout";
 import Product from "./pages/Products/Product";
 import ProductDetail from "./pages/Products/ProductDetail";
+import Login from "./components/Auth/Login";
+import SignUp from "./components/Auth/SignUp";
 
 export const router = createBrowserRouter([
   {
@@ -35,5 +37,13 @@ export const router = createBrowserRouter([
         ],
       },
     ],
+  },
+  {
+    path: "/signin",
+    Component: Login,
+  },
+  {
+    path: "/signup",
+    Component: SignUp,
   },
 ]);
