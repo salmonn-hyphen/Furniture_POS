@@ -31,9 +31,9 @@ export default function LoginForm({
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="username@example.com"
+                  id="phone"
+                  type="text"
+                  placeholder="+959*********"
                   // required
                 />
               </Field>

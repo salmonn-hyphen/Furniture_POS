@@ -1,5 +1,5 @@
 import { HomeIcon } from "lucide-react";
-import { Menu } from "lucide-react";
+import { Menu, ShoppingCart } from "lucide-react";
 import {
   ExclamationTriangleIcon,
   ArrowLeftIcon,
@@ -60,4 +60,5 @@ export const Icons = {
   dashboard: DashboardIcon,
   gear: GearIcon,
   exit: ExitIcon,
+  cart: ShoppingCart,
 };
