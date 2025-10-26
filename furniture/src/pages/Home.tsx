@@ -70,7 +70,7 @@ function Home() {
         />
         <div className="grid grid-cols-1 gap-6 px-4 md:grid-cols-2 md:px-0 lg:grid-cols-4">
           {simpleProducts.map((product) => (
-            <ProductCard products={product} key="product.id" />
+            <ProductCard products={product} key={product.id} />
           ))}
         </div>
         <Title title="Recent Blog" href="/blogs" sideText="View All Posts" />
