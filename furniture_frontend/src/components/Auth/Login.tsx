@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { Icons } from "../logo";
 import { siteConfig } from "../../config/site";
-import LoginForm from "../Auth/LoginForm";
+import LoginForm from "./LoginForm";
 
 function Login() {
   return (

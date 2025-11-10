@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { Separator } from "../ui/separator";
 
 const quantitySchema = z.object({
   quantity: z.number().min(0),
@@ -91,6 +92,7 @@ export function CartButton() {
         </Button>
         {/* Buttons End */}
       </form>
+      <Separator className="my-4" />
     </Form>
   );
 }

@@ -30,7 +30,6 @@ function CartItem({ cart }: CartProps) {
           </div>
         </div>
         <CartButton />
-        <Separator />
       </div>
     </>
   );
