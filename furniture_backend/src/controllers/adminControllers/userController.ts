@@ -9,5 +9,6 @@ export const getAllUsers = (
   res: Response,
   next: NextFunction
 ) => {
-  res.status(200).json("user controller");
+  const id = req.userId;
+  res.status(200).json({ message: req.t("welcome"), userId: id });
 };
