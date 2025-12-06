@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 
 interface CustomReq extends Request {
   userId?: number;
+  user?: any;
 }
 
 export const getAllUsers = (
@@ -10,5 +11,8 @@ export const getAllUsers = (
   next: NextFunction
 ) => {
   const id = req.userId;
-  res.status(200).json({ message: req.t("welcome"), userId: id });
+  const user = req.user;
+  res
+    .status(200)
+    .json({ message: req.t("welcome"), userId: id, currentRole: user.role });
 };
