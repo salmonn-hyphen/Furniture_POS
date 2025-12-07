@@ -149,3 +149,9 @@ model ProductsOnOrders {
   order     Order   @relation(fields: [orderId], references: [id])
   product   Product @relation(fields: [productId], references: [id])
 }
+
+model Setting {
+  id        Int     @id @default(autoincrement())
+  key       String  @unique @db.VarChar(50)
+  value     String  @db.VarChar(200)
+}

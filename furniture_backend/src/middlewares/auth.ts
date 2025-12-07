@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
 import { getUserById, updateUser } from "../services/authService";
+import { createError } from "../utils/error";
+import { errorCode } from "../config/errorCode";
 
 interface CustomReq extends Request {
   userId?: number;
@@ -18,32 +20,44 @@ export const auth = (req: CustomReq, res: Response, next: NextFunction) => {
         phone: string;
       };
     } catch (error: any) {
-      error = new Error("You are not an authenticated user!");
-      error.status = 401;
-      error.code = "Error_Unauthenticated";
-      return next(error);
+      return next(
+        createError(
+          "You are not an authenticated user!",
+          401,
+          errorCode.unauthenticated
+        )
+      );
     }
 
     const user = await getUserById(decoded.id);
     if (!user) {
-      const error: any = "This account has not registered!";
-      error.status = 401;
-      error.code = "Error_Unauthenticated";
-      return next(error);
+      return next(
+        createError(
+          "This account has not registered!",
+          401,
+          errorCode.unauthenticated
+        )
+      );
     }
 
     if (user.phone !== decoded.phone) {
-      const error: any = "This account has not registered!";
-      error.status = 401;
-      error.code = "Error_Unauthenticated";
-      return next(error);
+      return next(
+        createError(
+          "This account has not registered!",
+          401,
+          errorCode.unauthenticated
+        )
+      );
     }
 
     if (user.randToken !== refreshToken) {
-      const error: any = "This account has not registered!";
-      error.status = 401;
-      error.code = "Error_Unauthenticated";
-      return next(error);
+      return next(
+        createError(
+          "This account has not registered!",
+          401,
+          errorCode.unauthenticated
+        )
+      );
     }
 
     const accessPayload = { id: user!.id };
@@ -84,10 +98,13 @@ export const auth = (req: CustomReq, res: Response, next: NextFunction) => {
     next();
   };
   if (!refreshToken) {
-    const error: any = "You are not an authenticated user!";
-    error.status = 401;
-    error.code = "Error_Unauthenticated";
-    return next(error);
+    return next(
+      createError(
+        "You are not an authenticated user!",
+        401,
+        errorCode.unauthenticated
+      )
+    );
   }
   if (!accessToken) {
     generateNewToken();
@@ -105,10 +122,9 @@ export const auth = (req: CustomReq, res: Response, next: NextFunction) => {
         error.status = 401;
         error.code = "Error_Expired";
       } else {
-        const error: any = new Error("Access token is invalid!");
-        error.status = 400;
-        error.code = "Error_Attack";
-        return next(error);
+        return next(
+          createError("Access Token is invalid.", 400, errorCode.attack)
+        );
       }
     }
   }

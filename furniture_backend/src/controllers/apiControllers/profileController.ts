@@ -3,6 +3,8 @@ import { body, query, validationResult } from "express-validator";
 import { authorize } from "../../utils/authorize";
 import { getUserById } from "../../services/authService";
 import { checkUserIfNotExist } from "../../utils/auth";
+import { errorCode } from "../../config/errorCode";
+import { createError } from "../../utils/error";
 
 interface CustomReq extends Request {
   userId?: number;
@@ -17,10 +19,7 @@ export const changeLanguage = [
   (req: CustomReq, res: Response, next: NextFunction) => {
     const errors = validationResult(req).array({ onlyFirstError: true });
     if (errors.length > 0) {
-      const error: any = new Error(errors[0].msg);
-      error.status = 400;
-      error.code = "Error_Invalid";
-      return next(error);
+      return next(createError(errors[0].msg, 400, errorCode.invalid));
     }
     const { lng } = req.query;
     res.cookie("i18next", lng);

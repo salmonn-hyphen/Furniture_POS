@@ -17,6 +17,7 @@ import { crossOriginResourcePolicy } from "helmet";
 import moment from "moment";
 import { errorCode } from "../config/errorCode";
 import jwt from "jsonwebtoken";
+import { createError } from "../utils/error";
 
 export const forgetPassword = [
   body("phone", "Invalid Phone Number")
@@ -110,7 +111,6 @@ export const verifyOtpForPassword = [
     const user = getUserByPhone(phone);
     checkUserIfNotExist(user);
     const otpInfo = await getOtpByPhone(phone);
-    checkOtpInfo(otpInfo);
 
     const lastVerifyOtp = new Date(otpInfo!.updatedAt).toDateString();
     const today = new Date().toDateString();
@@ -189,9 +189,7 @@ export const resetPassword = [
   async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req).array({ onlyFirstError: true });
     if (errors.length > 0) {
-      const error: any = new Error(errors[0].msg);
-      error.status = 400;
-      error.code = errorCode.invalid;
+      return next(createError(errors[0].msg, 400, errorCode.invalid));
     }
     const { phone, password, token } = req.body;
     // check if the user is already exist
@@ -202,10 +200,9 @@ export const resetPassword = [
 
     //If error is overlimit, user cannot reach this stage
     if (otpInfo?.error == 5) {
-      const error: any = new Error("This request may be an attack");
-      error.status = 400;
-      error.code = "Error_BadRequest";
-      return next(error);
+      return next(
+        createError("This request may be an attack", 400, errorCode.attack)
+      );
     }
     //check verify token is match
     if (otpInfo?.verifyToken !== token) {
@@ -213,18 +210,18 @@ export const resetPassword = [
         error: 5,
       };
       await updateOtp(otpInfo!.id, otpData);
-      const error: any = new Error("Token is invalid");
-      error.status = 400;
-      error.code = "Expired_Invalid";
-      return next(error);
+      return next(createError("Token is invalid", 400, errorCode.invalid));
     }
     //check request is expired
     const isExpired = moment().diff(otpInfo?.updatedAt, "minutes") > 10;
     if (isExpired) {
-      const error: any = new Error("Your Request is expired, try again");
-      error.status = 403;
-      error.code = "Error_Expired";
-      return next(error);
+      return next(
+        createError(
+          "Your Request is expired, try again",
+          403,
+          errorCode.requestExpired
+        )
+      );
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
