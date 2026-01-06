@@ -40,7 +40,7 @@ export const updateUser = async (id: number, userData: any) => {
   });
 };
 
-export const getUserById = async (id: number) => {
+export const getUserById = async (id?: number) => {
   return prisma.user.findUnique({
     where: { id },
   });
