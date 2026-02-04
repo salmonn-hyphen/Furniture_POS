@@ -1,14 +1,8 @@
 import { Worker } from "bullmq";
-import { Redis } from "ioredis";
 import sharp from "sharp";
 import path from "path";
-import { unlink } from "node:fs/promises";
-const connection = new Redis({
-  host: process.env.REDIS_HOST,
-  port: 6379,
-  maxRetriesPerRequest: null,
-});
-
+import "dotenv/config";
+import { redisConnection } from "../../config/redisConnection";
 //create a worker for image optimization queue
 const imageWorker = new Worker(
   "imageQueue",
@@ -18,14 +12,16 @@ const imageWorker = new Worker(
       __dirname,
       "../../..",
       "/uploads/optimize",
-      fileName
+      fileName,
     );
     await sharp(filePath)
       .resize(width, height)
       .webp({ quality: quality })
       .toFile(optimizedImagePath);
   },
-  { connection }
+  {
+    connection: redisConnection,
+  },
 );
 
 imageWorker.on("completed", (job) => {

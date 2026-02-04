@@ -10,7 +10,7 @@ export const getSettingStatus = async (key: string) => {
 
 export const createOrUpdateSettingStatus = async (
   key: string,
-  value: string
+  value: string,
 ) => {
   return prisma.setting.upsert({
     where: { key },

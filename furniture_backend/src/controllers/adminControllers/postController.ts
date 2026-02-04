@@ -5,7 +5,6 @@ import { createError } from "../../utils/error";
 import { getUserById } from "../../services/authService";
 import { checkUserIfNotExist } from "../../utils/auth";
 import { checkFile, checkModelIfExist } from "../../utils/check";
-import imageQueue from "../../jobs/queues/imageQueue";
 import {
   createOnePost,
   deleteOnePost,
@@ -16,21 +15,24 @@ import {
 import sanitizeHtml from "sanitize-html";
 import path from "node:path";
 import { unlink } from "node:fs/promises";
+import imageQueue from "../../jobs/queues/imageQueue";
+import { cacheQueue } from "../../jobs/queues/cacheQueue";
 
 interface CustomReq extends Request {
+  user: any;
   userId?: number;
   file?: any;
 }
 const removeFiles = async (
   originalFile: string,
-  optimizedFile: string | null
+  optimizedFile: string | null,
 ) => {
   try {
     const originalFilePath = path.join(
       __dirname,
       "../../..",
       "/uploads/images",
-      originalFile
+      originalFile,
     );
     await unlink(originalFilePath);
 
@@ -39,7 +41,7 @@ const removeFiles = async (
         __dirname,
         "../../..",
         "/uploads/optimize",
-        optimizedFile
+        optimizedFile,
       );
 
       await unlink(optimizedFilePath);
@@ -48,6 +50,7 @@ const removeFiles = async (
     console.log(error);
   }
 };
+
 export const createPost = [
   body("title", "Title is required").trim().notEmpty().escape(),
   body("content", "Content is required").trim().notEmpty().escape(),
@@ -75,20 +78,20 @@ export const createPost = [
       return next(createError(errors[0].msg, 400, errorCode.invalid));
     }
     const { title, content, body, category, type, tags } = req.body;
-    const userId = req.userId;
+    const user = req.user;
 
     const image = req.file;
     checkFile(image);
-    const user = await getUserById(userId);
-    if (!user) {
-      return next(
-        createError(
-          "This phone has not registered",
-          401,
-          errorCode.unauthenticated
-        )
-      );
-    }
+    // const user = await getUserById(userId);
+    // if (!user) {
+    //   return next(
+    //     createError(
+    //       "This phone has not registered",
+    //       401,
+    //       errorCode.unauthenticated,
+    //     ),
+    //   );
+    // }
 
     const fileName = image?.filename.split(".")[0];
     const job = await imageQueue.add(
@@ -106,7 +109,7 @@ export const createPost = [
           type: "exponential",
           delay: 1000,
         },
-      }
+      },
     );
     const data: PostArgs = {
       title,
@@ -119,6 +122,16 @@ export const createPost = [
       tags,
     };
     const post = await createOnePost(data);
+    await cacheQueue.add(
+      "invalidate-post-cache",
+      {
+        pattern: "posts:*",
+      },
+      {
+        jobId: `Invalidate-${Date.now()}`,
+        priority: 1,
+      },
+    );
     res.status(201).json({ message: "Successfully created new post" });
   },
 ];
@@ -151,22 +164,22 @@ export const updatePost = [
       return next(createError(errors[0].msg, 400, errorCode.invalid));
     }
     const { postId, title, content, body, category, type, tags } = req.body;
-    const userId = req.userId;
-    const user = await getUserById(userId);
+    const user = req.user;
+    // const user = await getUserById(userId);
 
-    //return error if the user does not exist
-    if (!user) {
-      if (req.file) {
-        await removeFiles(req.file.filename, null);
-      }
-      return next(
-        createError(
-          "This phone has not registered",
-          401,
-          errorCode.unauthenticated
-        )
-      );
-    }
+    // //return error if the user does not exist
+    // if (!user) {
+    //   if (req.file) {
+    //     await removeFiles(req.file.filename, null);
+    //   }
+    //   return next(
+    //     createError(
+    //       "This phone has not registered",
+    //       401,
+    //       errorCode.unauthenticated,
+    //     ),
+    //   );
+    // }
 
     //check is post exist and return error if doesn't
     const post = await getPostById(+postId);
@@ -175,7 +188,7 @@ export const updatePost = [
         await removeFiles(req.file.filename, null);
       }
       return next(
-        createError("The post does not exist", 401, errorCode.invalid)
+        createError("The post does not exist", 401, errorCode.invalid),
       );
     }
 
@@ -185,7 +198,7 @@ export const updatePost = [
         await removeFiles(req.file.filename, null);
       }
       return next(
-        createError("This action did not allowed", 403, errorCode.invalid)
+        createError("This action did not allowed", 403, errorCode.invalid),
       );
     }
 
@@ -217,12 +230,22 @@ export const updatePost = [
             type: "exponential",
             delay: 1000,
           },
-        }
+        },
       );
       const optimizedFile = post.image.split(".")[0] + ".webp";
       await removeFiles(post.image, optimizedFile);
     }
     await updateOnePost(post.id, data);
+    await cacheQueue.add(
+      "invalidate-post-cache",
+      {
+        pattern: "posts:*",
+      },
+      {
+        jobId: `Invalidate-${Date.now()}`,
+        priority: 1,
+      },
+    );
     res
       .status(200)
       .json({ message: "Successfully updated the post", postId: postId });
@@ -236,27 +259,37 @@ export const deletePost = [
     if (errors.length > 0) {
       return next(createError(errors[0].msg, 400, errorCode.invalid));
     }
-    const { postId } = req.body;
-    const userId = req.userId;
-    const user = getUserById(userId);
-    if (!user) {
-      return next(
-        createError(
-          "This phone has not registered",
-          401,
-          errorCode.unauthenticated
-        )
-      );
-    }
+    const { postId, user } = req.body;
+    // const userId = req.userId;
+    // const user = getUserById(userId);
+    // if (!user) {
+    //   return next(
+    //     createError(
+    //       "This phone has not registered",
+    //       401,
+    //       errorCode.unauthenticated,
+    //     ),
+    //   );
+    // }
     const post = await getPostById(+postId);
     await checkModelIfExist(post);
 
-    if (userId !== post!.authorId) {
+    if (user!.id !== post!.authorId) {
       return next(
-        createError("This action did not allowed", 403, errorCode.invalid)
+        createError("This action did not allowed", 403, errorCode.invalid),
       );
     }
     const deletedPost = await deleteOnePost(postId);
+    await cacheQueue.add(
+      "invalidate-post-cache",
+      {
+        pattern: "posts:*",
+      },
+      {
+        jobId: `Invalidate-${Date.now()}`,
+        priority: 1,
+      },
+    );
     const optimizedImage = post?.image.split(".")[0] + ".webp";
     await removeFiles(post!.image, optimizedImage);
     res
