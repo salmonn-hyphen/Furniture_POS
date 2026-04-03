@@ -1,0 +1,1 @@
+{"version":3,"file":"checkController.js","sourceRoot":"","sources":["../../src/controllers/checkController.ts"],"names":[],"mappings":";;;AAMO,MAAM,WAAW,GAAG,CACzB,GAAc,EACd,GAAa,EACb,IAAkB,EAClB,EAAE;IACF,GAAG,CAAC,MAAM,CAAC,GAAG,CAAC,CAAC,IAAI,CAAC;QACnB,OAAO,EAAE,oCAAoC;QAC7C,MAAM,EAAE,GAAG,CAAC,MAAM;KACnB,CAAC,CAAC;AACL,CAAC,CAAC;AATW,QAAA,WAAW,eAStB"}

@@ -14,6 +14,10 @@ import {
   getPost,
   getPostsByPagination,
 } from "../../../controllers/apiControllers/postController";
+import {
+  getProducts,
+  getProductsByPagination,
+} from "../../../controllers/apiControllers/productController";
 
 const router = express.Router();
 
@@ -39,4 +43,8 @@ router.patch(
 router.get("/posts", auth, getPostsByPagination); // Offset Pagination
 router.get("/posts/infinite", auth, getInfinitePostsByPagination); // Cursor-based Pagination
 router.get("/posts/:id", auth, getPost);
+
+//Routes for get product details
+router.get("/products/:id", auth, getProducts);
+router.get("/products", auth, getProductsByPagination);
 export default router;

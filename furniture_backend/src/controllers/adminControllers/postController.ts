@@ -19,9 +19,9 @@ import imageQueue from "../../jobs/queues/imageQueue";
 import { cacheQueue } from "../../jobs/queues/cacheQueue";
 
 interface CustomReq extends Request {
-  user: any;
   userId?: number;
   file?: any;
+  user?: any;
 }
 const removeFiles = async (
   originalFile: string,
@@ -78,10 +78,10 @@ export const createPost = [
       return next(createError(errors[0].msg, 400, errorCode.invalid));
     }
     const { title, content, body, category, type, tags } = req.body;
-    const user = req.user;
-
+    const user = req.user!;
     const image = req.file;
     checkFile(image);
+    // const userId = req.userId;
     // const user = await getUserById(userId);
     // if (!user) {
     //   return next(
@@ -165,21 +165,6 @@ export const updatePost = [
     }
     const { postId, title, content, body, category, type, tags } = req.body;
     const user = req.user;
-    // const user = await getUserById(userId);
-
-    // //return error if the user does not exist
-    // if (!user) {
-    //   if (req.file) {
-    //     await removeFiles(req.file.filename, null);
-    //   }
-    //   return next(
-    //     createError(
-    //       "This phone has not registered",
-    //       401,
-    //       errorCode.unauthenticated,
-    //     ),
-    //   );
-    // }
 
     //check is post exist and return error if doesn't
     const post = await getPostById(+postId);
@@ -259,7 +244,8 @@ export const deletePost = [
     if (errors.length > 0) {
       return next(createError(errors[0].msg, 400, errorCode.invalid));
     }
-    const { postId, user } = req.body;
+    const postId = req.body;
+    const user = req.user;
     // const userId = req.userId;
     // const user = getUserById(userId);
     // if (!user) {

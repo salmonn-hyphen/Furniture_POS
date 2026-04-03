@@ -10,6 +10,6 @@ const router = express.Router();
 
 //router.use("/api/v1", healthRoute);
 router.use("/api/v1/", authRoute);
-router.use("/api/v1/admins", auth, authorize(true, "AUTHOR"), adminRoute);
+router.use("/api/v1/admins", auth, authorize(true, "ADMIN"), adminRoute);
 router.use("/api/v1/user", profileRoute);
 export default router;
