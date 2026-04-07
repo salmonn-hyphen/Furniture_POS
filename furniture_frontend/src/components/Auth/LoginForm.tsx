@@ -6,21 +6,61 @@ import {
   Field,
   FieldDescription,
   FieldGroup,
-  FieldLabel,
   FieldSeparator,
 } from "../ui/field";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
 import { Input } from "../ui/input";
-import { Link } from "react-router";
+import { Link, useSubmit } from "react-router";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { PasswordInput } from "./PasswordInput";
+
+const loginSchema = z.object({
+  phone: z
+    .string()
+    .min(9, "Please enter the correct phone number!")
+    .max(12, "Please enter the correct phone number!")
+    .regex(/^\d+$/, "Phone number must be number!"),
+  password: z
+    .string()
+    .min(8, "Password must be 8 digits!")
+    .max(8, "Password must be 8 digits!")
+    .regex(
+      /^(?=.*\d)(?=.*[@!#])[0-9@!#]+$/,
+      "Password must include number and special character !",
+    ),
+});
 
 export default function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const submit = useSubmit();
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      phone: "",
+      password: "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof loginSchema>) {
+    submit(values, { method: "POST", action: "/signin" });
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <div className="p-6 md:p-8">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -28,36 +68,67 @@ export default function LoginForm({
                   Login to your account
                 </p>
               </div>
-              <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  id="phone"
-                  type="text"
-                  placeholder="+959*********"
-                  // required
-                />
-              </Field>
-              <Field>
-                <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  //required
-                />
-              </Field>
-              <Field>
-                <Button asChild>
-                  <Link to="/">Login</Link>
-                </Button>
-              </Field>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="grid w-full pr-8 lg:pr-0"
+                >
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem className="relative space-y-0">
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormLabel className="sr-only">Phone Number</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="09*********"
+                            type="tel"
+                            required
+                            className="pr-12"
+                            {...field}
+                          />
+                        </FormControl>
+                        <div className="min-h-3">
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem className="relative space-y-0">
+                        <div className="mt-3 flex flex-row">
+                          <FormLabel>Password</FormLabel>
+                          <FormLabel className="sr-only">Password</FormLabel>
+                          <Link
+                            to="#"
+                            className="ml-auto text-sm underline-offset-4 hover:underline"
+                          >
+                            Forgot your password?
+                          </Link>
+                        </div>
+                        <FormControl>
+                          <PasswordInput
+                            type="password"
+                            required
+                            className="pr-12"
+                            {...field}
+                          />
+                        </FormControl>
+                        <div className="min-h-3">
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="mt-2">
+                    Login
+                  </Button>
+                </form>
+              </Form>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
               </FieldSeparator>
@@ -95,7 +166,7 @@ export default function LoginForm({
                 <Link to="/signup">Sign up</Link>
               </FieldDescription>
             </FieldGroup>
-          </form>
+          </div>
           <div className="bg-muted relative hidden md:block">
             <img
               src={Banner}

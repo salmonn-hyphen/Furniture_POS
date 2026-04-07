@@ -80,7 +80,7 @@ export const register = [
           throw createError(
             "Allowed to request OTP 3 times per a day, Try Later",
             409,
-            errorCode.overLimit
+            errorCode.overLimit,
           );
         } else {
           const otpData = {
@@ -145,7 +145,7 @@ export const verifyOtp = [
     const isExpired = moment().diff(otpInfo?.updatedAt, "minutes") > 2;
     if (isExpired) {
       return next(
-        createError("OTP is Expired, Try Again..", 401, errorCode.otpExpired)
+        createError("OTP is Expired, Try Again..", 401, errorCode.otpExpired),
       );
     }
 
@@ -211,7 +211,7 @@ export const confirmPassword = [
     //If error is overlimit, user cannot reach this stage
     if (otpInfo?.error == 5) {
       return next(
-        createError("This request may be an attack", 400, errorCode.attack)
+        createError("This request may be an attack", 400, errorCode.attack),
       );
     }
 
@@ -231,8 +231,8 @@ export const confirmPassword = [
         createError(
           "Your Request is expired, try again",
           403,
-          errorCode.requestExpired
-        )
+          errorCode.requestExpired,
+        ),
       );
     }
 
@@ -255,14 +255,14 @@ export const confirmPassword = [
       process.env.ACCESS_TOKEN_SECRET!,
       {
         expiresIn: 60 * 15,
-      }
+      },
     );
     const refreshToken = jwt.sign(
       refreshPayload,
       process.env.REFRESH_TOKEN_SECRET!,
       {
         expiresIn: "30days",
-      }
+      },
     );
     const userUpdateData = {
       randToken: refreshToken,
@@ -274,6 +274,7 @@ export const confirmPassword = [
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       maxAge: 15 * 60 * 1000, // 15 minutes
+      path: "/",
     });
 
     res.cookie("refreshToken", refreshToken, {
@@ -281,6 +282,7 @@ export const confirmPassword = [
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30days
+      path: "/",
     });
 
     res
@@ -314,8 +316,8 @@ export const login = [
         createError(
           "Your account is temporarily locked,Contact us",
           400,
-          errorCode.accountFreeze
-        )
+          errorCode.accountFreeze,
+        ),
       );
     }
     //Check is the password correct
@@ -356,14 +358,14 @@ export const login = [
       process.env.ACCESS_TOKEN_SECRET!,
       {
         expiresIn: 60 * 15, //15 minutes
-      }
+      },
     );
     const refreshToken = jwt.sign(
       refreshPayload,
       process.env.REFRESH_TOKEN_SECRET!,
       {
         expiresIn: "30days",
-      }
+      },
     );
     const userData = {
       errorLoginCount: 0,
@@ -377,12 +379,14 @@ export const login = [
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
         maxAge: 15 * 60 * 1000, // 15 minutes
+        path: "/",
       })
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30days
+        path: "/",
       })
       .status(200)
       .json({ message: "Successfully Logged In.", userId: user?.id });
@@ -392,7 +396,7 @@ export const login = [
 export const logout = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   //clear http only cookie and update randToken in user table
   const refreshToken = req.cookies ? req.cookies.refreshToken : null;
@@ -401,8 +405,8 @@ export const logout = async (
       createError(
         "You are not an authenticated user!",
         401,
-        errorCode.unauthenticated
-      )
+        errorCode.unauthenticated,
+      ),
     );
   }
 
@@ -417,8 +421,8 @@ export const logout = async (
       createError(
         "You are not an authenticated user!",
         401,
-        errorCode.unauthenticated
-      )
+        errorCode.unauthenticated,
+      ),
     );
   }
 
@@ -430,8 +434,8 @@ export const logout = async (
       createError(
         "You are not an authenticated user!",
         401,
-        errorCode.unauthenticated
-      )
+        errorCode.unauthenticated,
+      ),
     );
   }
 
@@ -439,8 +443,18 @@ export const logout = async (
     randToken: generateToken(),
   };
   await updateUser(user!.id, userData);
-  res.clearCookie("accessToken");
-  res.clearCookie("refreshToken");
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    path: "/",
+  });
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    path: "/",
+  });
 
   res.status(200).json({ message: "Successfully Logged Out" });
 };

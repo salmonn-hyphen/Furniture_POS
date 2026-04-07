@@ -11,6 +11,7 @@ import Product from "./pages/Products/Product";
 import ProductDetail from "./pages/Products/ProductDetail";
 import Login from "./components/Auth/Login";
 import SignUp from "./components/Auth/SignUp";
+import { loginAction } from "./router/action";
 
 export const router = createBrowserRouter([
   {
@@ -41,6 +42,7 @@ export const router = createBrowserRouter([
   {
     path: "/signin",
     Component: Login,
+    action: loginAction,
   },
   {
     path: "/signup",

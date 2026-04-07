@@ -119,4 +119,17 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  .password-input::-ms-reveal,
+  .password-input::-ms-clear {
+    display: none;
+  }
+
+  .password-input::-webkit-credentials-auto-fill-button,
+  .password-input::-webkit-textfield-decoration-container {
+    visibility: hidden;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+  }
 }

@@ -24,21 +24,22 @@ var whitelist = ["http://example1.com", "http://localhost:5173"];
 var corsOptions = {
   origin: function (
     origin: any,
-    callback: (err: Error | null, origin?: any) => void
+    callback: (err: Error | null, origin?: any) => void,
   ) {
-    if (whitelist.indexOf(origin) !== -1) {
+    if (!origin || whitelist.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
+  credentials: true,
 };
 
 app
   .use(morgan("dev"))
   .use(express.urlencoded({ extended: true }))
   .use(express.json())
-  .use(cors())
+  .use(cors(corsOptions))
   .use(cookieParser())
   .use(helmet())
   .use(compression())
@@ -53,7 +54,7 @@ i18next
         process.cwd(),
         "src/locals",
         "{{lng}}",
-        "{{ns}}.json"
+        "{{ns}}.json",
       ),
     },
     detection: {
