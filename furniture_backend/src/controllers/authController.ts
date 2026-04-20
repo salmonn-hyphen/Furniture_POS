@@ -458,3 +458,23 @@ export const logout = async (
 
   res.status(200).json({ message: "Successfully Logged Out" });
 };
+
+interface CustomReq extends Request {
+  userId?: number;
+}
+
+export const authCheck = async (
+  req: CustomReq,
+  res: Response,
+  next: NextFunction,
+) => {
+  const userId = req.userId;
+  const user = await getUserById(userId!);
+  checkUserIfNotExist(user);
+  res.status(200).json({
+    message: "You are authenticated.",
+    userId: user?.id,
+    username: user?.firstName + " " + user?.lastName,
+    image: user?.image,
+  });
+};

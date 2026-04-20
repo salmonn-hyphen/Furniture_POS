@@ -17,11 +17,12 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { Link, useSubmit } from "react-router";
+import { Link, useSubmit, useNavigation, useActionData } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { PasswordInput } from "./PasswordInput";
+import { Spinner } from "../ui/spinner";
 
 const loginSchema = z.object({
   phone: z
@@ -44,6 +45,12 @@ export default function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const submit = useSubmit();
+  const navigation = useNavigation();
+  const actionData = useActionData() as {
+    error?: string;
+    message?: string;
+  };
+  const isSubmitting = navigation.state === "submitting";
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -120,12 +127,17 @@ export default function LoginForm({
                         </FormControl>
                         <div className="min-h-3">
                           <FormMessage />
+                          {actionData && (
+                            <p className="text-sm text-red-500">
+                              {actionData?.message}
+                            </p>
+                          )}
                         </div>
                       </FormItem>
                     )}
                   />
                   <Button type="submit" className="mt-2">
-                    Login
+                    {isSubmitting ? <Spinner /> : "Login"}
                   </Button>
                 </form>
               </Form>

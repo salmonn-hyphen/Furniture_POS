@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, redirect } from "react-router";
 import HomePage from "./pages/Home";
 import RootLayout from "./pages/RootLayout";
 import ErrorPage from "./pages/Error";
@@ -10,8 +10,23 @@ import ProductRootLayout from "./pages/Products/ProductRootLayout";
 import Product from "./pages/Products/Product";
 import ProductDetail from "./pages/Products/ProductDetail";
 import Login from "./components/Auth/Login";
-import SignUp from "./components/Auth/SignUp";
-import { loginAction } from "./router/action";
+import SignUp from "./pages/Auth/SignUp";
+import {
+  confirmAction,
+  loginAction,
+  logoutAction,
+  otpAction,
+  registerAction,
+} from "./router/action";
+import {
+  confirmLoader,
+  loginLoader,
+  otpLoader,
+  signupLoader,
+} from "./router/loader";
+import AuthRootLayout from "./pages/Auth/AuthRootLayout";
+import OtpVerify from "./pages/Auth/OtpVerify";
+import ConfirmPassword from "./pages/Auth/ConfirmPassword";
 
 export const router = createBrowserRouter([
   {
@@ -43,9 +58,35 @@ export const router = createBrowserRouter([
     path: "/signin",
     Component: Login,
     action: loginAction,
+    loader: loginLoader,
   },
   {
     path: "/signup",
-    Component: SignUp,
+    Component: AuthRootLayout,
+    action: registerAction,
+    children: [
+      {
+        index: true,
+        Component: SignUp,
+        loader: signupLoader,
+      },
+      {
+        path: "otp",
+        Component: OtpVerify,
+        loader: otpLoader,
+        action: otpAction,
+      },
+      {
+        path: "confirm-password",
+        Component: ConfirmPassword,
+        action: confirmAction,
+        loader: confirmLoader,
+      },
+    ],
+  },
+  {
+    path: "/logout",
+    action: logoutAction,
+    loader: () => redirect("/"),
   },
 ]);

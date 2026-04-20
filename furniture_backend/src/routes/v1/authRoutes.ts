@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  authCheck,
   confirmPassword,
   login,
   logout,
@@ -11,6 +12,7 @@ import {
   resetPassword,
   verifyOtpForPassword,
 } from "../../controllers/forgetPasswordController";
+import { auth } from "../../middlewares/auth";
 
 const router = express.Router();
 
@@ -23,4 +25,7 @@ router.post("/logout", logout);
 router.post("/forget-password", forgetPassword);
 router.post("/verify", verifyOtpForPassword);
 router.post("/reset-password", resetPassword);
+
+//auth check
+router.get("/auth-check", auth, authCheck);
 export default router;
