@@ -9,7 +9,7 @@
     "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["src/*"],
-      "@/api": ["api/index.ts"]
+      "@/api": ["src/api/index.ts"]
     },
     "erasableSyntaxOnly": false
   }

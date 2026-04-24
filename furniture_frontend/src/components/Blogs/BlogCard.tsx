@@ -1,9 +1,10 @@
 import { Link } from "react-router";
-import type { Posts } from "../../types/index";
+import type { Post } from "../../types/index";
 
 interface PostProps {
-  posts: Posts[];
+  posts: Post[];
 }
+const imageUrl = import.meta.env.VITE_IMG_URL;
 
 export default function BlogCard({ posts }: PostProps) {
   return (
@@ -12,15 +13,16 @@ export default function BlogCard({ posts }: PostProps) {
         {posts.map((post) => (
           <Link to={`/blogs/${post.id}`} key={post.id}>
             <img
-              src={post.image}
+              src={imageUrl + post.image}
               alt="Blog Image"
               className="mb-4 w-full rounded-2xl"
             />
             <h3 className="ml-4 line-clamp-1 font-semibold">{post.title}</h3>
             <div className="mt-2 ml-4 text-sm">
               <span>
-                by <span className="font-semibold"> {post.author} </span>
-                on <span className="font-semibold"> {post.updated_at} </span>
+                by{" "}
+                <span className="font-semibold"> {post.author.fullName} </span>
+                on <span className="font-semibold"> {post.updatedAt} </span>
               </span>
             </div>
           </Link>

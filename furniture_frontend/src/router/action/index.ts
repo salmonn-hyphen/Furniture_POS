@@ -1,5 +1,5 @@
 import useAuthStore, { Status } from "@/store/authStore";
-import api, { authApi } from "../../../api";
+import api, { authApi } from "../../api";
 import { AxiosError } from "axios";
 import { redirect, type ActionFunctionArgs } from "react-router";
 export const loginAction = async ({ request }: ActionFunctionArgs) => {

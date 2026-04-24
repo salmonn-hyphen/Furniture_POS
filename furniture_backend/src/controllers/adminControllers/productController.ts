@@ -14,6 +14,7 @@ import {
 } from "../../services/productService";
 import { cacheQueue } from "../../jobs/queues/cacheQueue";
 import { deleteOnePost } from "../../services/postService";
+import { log } from "console";
 
 interface CustomReq extends Request {
   userId?: number;
@@ -120,7 +121,7 @@ export const createProduct = [
     const originalFileNames = req.files.map((file: any) => ({
       path: file.filename,
     }));
-
+    console.log(originalFileNames);
     const data: any = {
       name,
       description,

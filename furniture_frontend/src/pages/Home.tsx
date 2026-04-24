@@ -2,14 +2,43 @@ import { Link } from "react-router";
 import { Button } from "../components/ui/button";
 import Couch from "../data/images/Couch.png";
 import CarouselComponent from "../components/Products/CarouselComponent";
-import { products } from "../data/products";
 import BlogCard from "../components/Blogs/BlogCard";
-import { Posts } from "../data/posts";
 import ProductCard from "../components/Products/ProductCard";
+import { postQuery, productQuery } from "../api/query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import type { Product } from "@/types";
 
 function Home() {
-  const simplePosts = Posts.slice(0, 3);
-  const simpleProducts = products.slice(0, 4);
+  // const {
+  //   data: productData,
+  //   isLoading: isLoadingProduct,
+  //   isError: isErrorProduct,
+  //   error: errorProduct,
+  // } = useQuery(productQuery("?limit=8"));
+
+  // const {
+  //   data: postData,
+  //   isLoading: isLoadingPost,
+  //   isError: isErrorPost,
+  //   error: errorPost,
+  // } = useQuery(postQuery("?limit=3"));
+
+  // if (isLoadingProduct && isLoadingPost) {
+  //   return <p className="text-center">is Loading....</p>;
+  // }
+
+  // if (isErrorProduct && isErrorPost) {
+  //   return (
+  //     <p className="text-center">
+  //       {errorProduct.message}
+  //       {errorPost.message}
+  //     </p>
+  //   );
+  // }
+
+  const { data: productData } = useSuspenseQuery(productQuery("?limit=8"));
+  const { data: postData } = useSuspenseQuery(postQuery("?limit=3"));
+
   const Title = ({
     title,
     href,
@@ -61,20 +90,19 @@ function Home() {
           </div>
           <img src={Couch} alt="" className="lg:w-3/5" />
         </div>
-
-        <CarouselComponent products={products} />
+        <CarouselComponent products={productData.products} />
         <Title
           title="Featured Product"
           href="/products"
           sideText="View All Products"
         />
         <div className="grid grid-cols-1 gap-6 px-4 md:grid-cols-2 md:px-0 lg:grid-cols-4">
-          {simpleProducts.map((product) => (
+          {productData.products.slice(0, 4).map((product: Product) => (
             <ProductCard products={product} key={product.id} />
           ))}
         </div>
         <Title title="Recent Blog" href="/blogs" sideText="View All Posts" />
-        <BlogCard posts={simplePosts} />
+        <BlogCard posts={postData.posts} />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import type { Products } from "../../types";
+import type { Product } from "../../types";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -15,6 +15,7 @@ import { formatPrice, cn } from "../../lib/utils";
 interface productProps extends React.HTMLAttributes<HTMLDivElement> {
   products: Products;
 }
+const imageUrl = import.meta.env.VITE_IMG_URL;
 
 function ProductCard({ products, className }: productProps) {
   return (
@@ -23,7 +24,7 @@ function ProductCard({ products, className }: productProps) {
         <CardHeader className="border-b p-0">
           <AspectRatio ratio={1 / 1} className="bg-muted">
             <img
-              src={products.images[0]}
+              src={imageUrl + products.images[0].path}
               alt=""
               className="size-full object-cover"
               loading="lazy"

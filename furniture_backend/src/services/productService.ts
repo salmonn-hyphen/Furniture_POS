@@ -30,7 +30,7 @@ export const createOneProduct = async (data: any) => {
   };
 
   if (data.tags && data.tags.length > 0) {
-    data.tags = {
+    productData.tags = {
       connectOrCreate: data.tags.map((tagName: string) => ({
         where: { name: tagName },
         create: {
@@ -79,7 +79,7 @@ export const updateOneProduct = async (productId: number, data: any) => {
     },
   };
   if (data.tags && data.tags.length > 0) {
-    data.tags = {
+    productData.tags = {
       set: [],
       connectOrCreate: data.tags.map((tagName: string) => ({
         where: { name: tagName },

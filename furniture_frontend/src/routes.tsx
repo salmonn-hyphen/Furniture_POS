@@ -19,7 +19,9 @@ import {
   registerAction,
 } from "./router/action";
 import {
+  blogInfiniteLoader,
   confirmLoader,
+  homeLoader,
   loginLoader,
   otpLoader,
   signupLoader,
@@ -34,13 +36,13 @@ export const router = createBrowserRouter([
     Component: RootLayout,
     ErrorBoundary: ErrorPage,
     children: [
-      { index: true, Component: HomePage },
+      { index: true, Component: HomePage, loader: homeLoader },
       { path: "about", Component: About },
       {
         path: "blogs",
         Component: BlogRootLayout,
         children: [
-          { index: true, Component: Blog },
+          { index: true, Component: Blog, loader: blogInfiniteLoader },
           { path: ":postId", Component: BlogDetail },
         ],
       },

@@ -8,7 +8,7 @@ export const prisma = prismaOrm.$extends({
       fullName: {
         needs: { firstName: true, lastName: true },
         compute(user) {
-          return `${user.firstName}+${user.lastName}`;
+          return `${user.firstName} ${user.lastName}`;
         },
       },
       image: {

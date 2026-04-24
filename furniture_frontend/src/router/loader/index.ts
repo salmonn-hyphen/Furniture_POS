@@ -1,6 +1,18 @@
 import { redirect } from "react-router";
-import { authApi } from "../../../api";
+import { authApi } from "../../api";
 import useAuthStore, { Status } from "@/store/authStore";
+import {
+  postInfiniteQuery,
+  postQuery,
+  productQuery,
+  queryClient,
+} from "@/api/query";
+
+export const homeLoader = async () => {
+  await queryClient.ensureQueryData(productQuery("?limit=8"));
+  await queryClient.ensureQueryData(postQuery("?limit=3"));
+  return null;
+};
 
 export const loginLoader = async () => {
   try {
@@ -42,5 +54,10 @@ export const confirmLoader = async () => {
   if (authStore.status !== Status.confirm) {
     return redirect("/signup");
   }
+  return null;
+};
+
+export const blogInfiniteLoader = async () => {
+  await queryClient.ensureInfiniteQueryData(postInfiniteQuery());
   return null;
 };

@@ -6,14 +6,14 @@ import {
   CarouselPrevious,
 } from "../ui/carousel";
 
-import type { Products } from "../../types/index";
+import type { Product } from "../../types/index";
 import { Link } from "react-router";
 import Autoplay from "embla-carousel-autoplay";
 
 interface ProductProps {
-  products: Products[];
+  products: Product[];
 }
-
+const imageUrl = import.meta.env.VITE_IMG_URL;
 export default function CarouselComponent({ products }: ProductProps) {
   return (
     <div className="">
@@ -33,8 +33,10 @@ export default function CarouselComponent({ products }: ProductProps) {
             >
               <div className="flex gap-4 p-4 lg:px-4">
                 <img
-                  src={product.images[0]}
+                  src={imageUrl + product.images[0].path}
                   alt={product.name}
+                  loading="lazy"
+                  decoding="async"
                   className="h-28 rounded-md bg-transparent"
                 />
                 <div className="">
@@ -44,6 +46,7 @@ export default function CarouselComponent({ products }: ProductProps) {
                   <p className="my-2 line-clamp-2 text-sm text-gray-600">
                     {product.description}
                   </p>
+
                   <Link
                     to={`/products/${product.id}`}
                     className="text-own text-sm font-semibold hover:underline"
