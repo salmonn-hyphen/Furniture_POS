@@ -14,30 +14,36 @@ import {
 import { Button } from "../ui/button";
 
 interface filterProps {
-  filterList: { categories: Category[]; types: Category[] };
+  categories: Category[];
+  types: Category[];
 }
 
+interface ProductFilterProps {
+  filterList: filterProps;
+  selectedCategory: string[];
+  selectedType: string[];
+  handleFilterChange: (category: string[], type: string[]) => void;
+}
 const FormSchema = z.object({
-  categories: z
-    .array(z.string())
-    .refine((value) => value.some((item) => item), {
-      message: "You have to select at least one category.",
-    }),
-  types: z.array(z.string()).refine((value) => value.some((item) => item), {
-    message: "You have to select at least one types.",
-  }),
+  categories: z.array(z.string()),
+  types: z.array(z.string()),
 });
 
-export default function FilterProduct({ filterList }: filterProps) {
+export default function FilterProduct({
+  filterList,
+  selectedCategory,
+  selectedType,
+  handleFilterChange,
+}: ProductFilterProps) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      categories: [],
-      types: [],
+      categories: selectedCategory,
+      types: selectedType,
     },
   });
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log("Simple Data is", data);
+    handleFilterChange(data.categories, data.types);
   }
   return (
     <div className="">
@@ -64,20 +70,22 @@ export default function FilterProduct({ filterList }: filterProps) {
                         >
                           <FormControl>
                             <Checkbox
-                              checked={field.value?.includes(item.id)}
+                              checked={field.value?.includes(
+                                item.id.toString(),
+                              )}
                               onCheckedChange={(checked) => {
-                                return checked
-                                  ? field.onChange([...field.value, item.id])
+                                  return checked
+                                    ? field.onChange([...field.value, item.id.toString()])
                                   : field.onChange(
                                       field.value?.filter(
-                                        (value) => value !== item.id,
+                                        (value) => value !== item.id.toString(),
                                       ),
                                     );
                               }}
                             />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
-                            {item.label}
+                            {item.name}
                           </FormLabel>
                         </FormItem>
                       );
@@ -109,20 +117,22 @@ export default function FilterProduct({ filterList }: filterProps) {
                         >
                           <FormControl>
                             <Checkbox
-                              checked={field.value?.includes(item.id)}
+                              checked={field.value?.includes(
+                                item.id.toString(),
+                              )}
                               onCheckedChange={(checked) => {
-                                return checked
-                                  ? field.onChange([...field.value, item.id])
+                                  return checked
+                                    ? field.onChange([...field.value, item.id.toString()])
                                   : field.onChange(
                                       field.value?.filter(
-                                        (value) => value !== item.id,
+                                        (value) => value !== item.id.toString(),
                                       ),
                                     );
                               }}
                             />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
-                            {item.label}
+                            {item.name}
                           </FormLabel>
                         </FormItem>
                       );

@@ -12,6 +12,8 @@ export function formatPrice(
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: opts.currency ?? "USD",
-    notation: opts.notation ?? "compact",
+    notation: "standard",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(Number(price));
 }

@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Header from "../components/Layouts/Header";
 import { ThemeProvider } from "../components/theme-provider";
+import { Toaster } from "../components/ui/sonner";
 import Footer from "../components/Layouts/Footer";
 function RootLayout() {
   return (
@@ -13,6 +14,7 @@ function RootLayout() {
           </main>
           <Footer />
         </div>
+        <Toaster />
       </ThemeProvider>
     </>
   );

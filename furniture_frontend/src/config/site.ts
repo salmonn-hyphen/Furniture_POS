@@ -19,14 +19,14 @@ export const siteConfig = {
           description: "comfortable with Wooden furniture.",
         },
         {
-          title: "Bamboo",
+          title: "Sofa",
           href: "/products?categories=2",
-          description: "Build your own Bamboo furniture.",
+          description: "Buy our latest Sofa furniture.",
         },
         {
-          title: "Metal",
+          title: "Steel",
           href: "/products?categories=3",
-          description: "Buy our latest metal furniture.",
+          description: "Build your own Steel furniture.",
         },
       ],
       menu: [

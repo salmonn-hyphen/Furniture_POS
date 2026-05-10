@@ -16,6 +16,8 @@ export default function BlogPostLists({ posts }: PostProps) {
               src={imageUrl + post.image}
               alt="Blog Image"
               className="mb-4 w-full rounded-xl"
+              loading="lazy"
+              decoding="async"
             />
             <h2 className="line-clamp-1 text-xl font-extrabold">
               {post.title}

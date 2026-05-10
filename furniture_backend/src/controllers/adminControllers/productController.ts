@@ -135,9 +135,9 @@ export const createProduct = [
     };
     const post = await createOneProduct(data);
     await cacheQueue.add(
-      "invalidate-post-cache",
+      "invalidate-product-cache",
       {
-        pattern: "posts:*",
+        pattern: "products:*",
       },
       {
         jobId: `Invalidate-${Date.now()}`,
@@ -253,9 +253,9 @@ export const updateProduct = [
 
     const updatedProduct = await updateOneProduct(product.id, data);
     await cacheQueue.add(
-      "invalidate-post-cache",
+      "invalidate-product-cache",
       {
-        pattern: "posts:*",
+        pattern: "products:*",
       },
       {
         jobId: `Invalidate-${Date.now()}`,
@@ -287,9 +287,9 @@ export const deleteProduct = [
     );
     await removeFiles(originalImg, optimizedImg);
     await cacheQueue.add(
-      "invalidate-post-cache",
+      "invalidate-product-cache",
       {
-        pattern: "posts:*",
+        pattern: "products:*",
       },
       {
         jobId: `Invalidate-${Date.now()}`,

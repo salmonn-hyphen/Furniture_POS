@@ -7,7 +7,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
-import type { Cart } from "../../types/index";
 import { Icons } from "../logo";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -16,13 +15,13 @@ import { Link } from "react-router";
 import { ScrollArea } from "../ui/scroll-area";
 import CartItem from "../Cart/CartItem";
 import { formatPrice } from "../../lib/utils";
+import { useCartStore } from "@/store/cartStore";
 
-interface CartProps {
-  cartItem: Cart[];
-}
-function CartSheet({ cartItem }: CartProps) {
-  const itemCount = 4;
-  const totalAmount = 390;
+function CartSheet() {
+  const itemCount = useCartStore((state) => state.getTotalItems());
+  const totalAmount = useCartStore((state) => state.getTotalPrice());
+
+  const { carts } = useCartStore();
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -32,27 +31,35 @@ function CartSheet({ cartItem }: CartProps) {
           aria-label="Cart Open"
           className="relative"
         >
-          <Badge
-            variant="destructive"
-            className="absolute -top-2 -right-2 size-6 justify-center rounded-full p-2.5"
-          >
-            {itemCount}
-          </Badge>
+          {itemCount > 0 && (
+            <Badge
+              variant="destructive"
+              className="absolute -top-2 -right-2 size-6 justify-center rounded-full p-2.5"
+            >
+              {itemCount}
+            </Badge>
+          )}
           <Icons.cart className="size-4" aria-hidden="true" />
         </Button>
       </SheetTrigger>
       <SheetContent className="w-full md:max-w-lg">
         <SheetHeader>
-          <SheetTitle className="flex justify-center text-2xl font-medium lg:block">
-            Cart - {itemCount}
-          </SheetTitle>
+          {itemCount > 0 ? (
+            <SheetTitle className="flex justify-center text-2xl font-medium lg:block">
+              Cart - {itemCount}
+            </SheetTitle>
+          ) : (
+            <SheetTitle className="flex justify-center text-2xl font-medium lg:block">
+              Empty Cart
+            </SheetTitle>
+          )}
           <Separator className="my-2" />
 
-          {cartItem.length > 0 ? (
+          {carts.length > 0 ? (
             <>
               <ScrollArea className="my-3 h-[64vh] pb-8">
                 <div className="flex-1">
-                  {cartItem.map((item) => (
+                  {carts.map((item) => (
                     <CartItem key={item.id} cart={item} />
                   ))}
                 </div>

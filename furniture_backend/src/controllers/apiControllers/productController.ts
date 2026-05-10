@@ -8,9 +8,16 @@ import { getOrSetCache } from "../../utils/cache";
 import { getPostWithRelations } from "../../services/postService";
 import { checkModelIfExist } from "../../utils/check";
 import {
+  getCategoryList,
   getProductList,
   getProductWithRelations,
+  getTypeList,
 } from "../../services/productService";
+import { cacheQueue } from "../../jobs/queues/cacheQueue";
+import {
+  addProductToFavorite,
+  removeProductFromFavorite,
+} from "../../services/userService";
 
 interface CustomRequest extends Request {
   userId?: number;
@@ -29,7 +36,7 @@ export const getProducts = [
     const user = await getUserById(userId);
     checkUserIfNotExist(user);
 
-    const cacheKey = `posts:${JSON.stringify(productId)}`;
+    const cacheKey = `products:${JSON.stringify(productId)}:user:${user!.id}`;
     const product = await getOrSetCache(cacheKey, async () => {
       return await getProductWithRelations(+productId, user!.id);
     });
@@ -42,7 +49,7 @@ export const getProducts = [
 export const getProductsByPagination = [
   query("cursor", "Cursor must be product Id!").isInt({ gt: 0 }).optional(),
   query("limit", "Limit number must be unsigned number!")
-    .isInt({ gt: 4 })
+    .isInt({ gt: 3 })
     .optional(),
   async (req: CustomRequest, res: Response, next: NextFunction) => {
     const error = validationResult(req).array({ onlyFirstError: true });
@@ -109,7 +116,7 @@ export const getProductsByPagination = [
       orderBy: { id: "desc" },
     };
 
-    const cacheKey = `posts:${JSON.stringify(req.query)}`;
+    const cacheKey = `products:${JSON.stringify(req.query)}`;
     const products = await getOrSetCache(cacheKey, async () => {
       return await getProductList(option);
     });
@@ -126,6 +133,58 @@ export const getProductsByPagination = [
       nextCursor,
       prevCursor: lastCursor,
       products,
+    });
+  },
+];
+
+export const getCategoryType = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  const userId = req.userId;
+  const user = await getUserById(userId!);
+  checkUserIfNotExist(user);
+
+  const categories = await getCategoryList();
+  const types = await getTypeList();
+  res.status(200).json({
+    message: "Categories and Types",
+    categories,
+    types,
+  });
+};
+
+export const toggleFavorite = [
+  body("productId", "Product Id must not be empty!").isInt({ gt: 0 }),
+  body("favorite", "Favorite must not be empty!").isBoolean(),
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const error = validationResult(req).array({ onlyFirstError: true });
+    //if the validation error occurs
+    if (error.length > 0) {
+      return next(createError(error[0].msg, 400, errorCode.invalid));
+    }
+
+    const userId = req.userId;
+    const user = await getUserById(userId);
+    checkUserIfNotExist(user);
+
+    const { productId, favorite } = req.body;
+    if (favorite) {
+      await addProductToFavorite(user!.id, productId);
+    } else {
+      await removeProductFromFavorite(user!.id, productId);
+    }
+
+    await cacheQueue.add(
+      "invalidate-product-cache",
+      { pattern: "products:*" },
+      { jobId: `invalidate-${Date.now()}`, priority: 1 },
+    );
+    res.status(200).json({
+      message: favorite
+        ? "Successfully added to favorite"
+        : "Successfully removed from favorite",
     });
   },
 ];

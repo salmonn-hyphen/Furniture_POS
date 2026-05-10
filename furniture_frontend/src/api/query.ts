@@ -1,4 +1,4 @@
-import { QueryClient } from "@tanstack/react-query";
+import { keepPreviousData, QueryClient } from "@tanstack/react-query";
 import api from ".";
 
 export const queryClient = new QueryClient({
@@ -37,4 +37,78 @@ export const postInfiniteQuery = () => ({
   queryFn: fetchInfinitePosts,
   initialPageParam: null,
   getNextPageParam: (lastPage, pages) => lastPage.nextCursor ?? undefined,
+});
+
+const fetchOnePost = async (id: number) => {
+  const post = await api.get(`user/posts/${id}`);
+  if (!post) {
+    throw new Response("", {
+      status: 404,
+      statusText: "Not Found",
+    });
+  }
+  return post.data;
+};
+
+export const onePostQuery = (id: number) => ({
+  queryKey: ["posts", "detail", id],
+  queryFn: () => fetchOnePost(id),
+});
+
+const fetchInfiniteProducts = async ({
+  pageParam = null,
+  categories = null,
+  types = null,
+}: {
+  pageParam?: number | null;
+  categories?: string | null;
+  types?: string | null;
+}) => {
+  let query = pageParam ? `?limit=6&cursor=${pageParam}` : "?limit=9";
+  if (categories) query += `&category=${categories}`;
+  if (types) query += `&type=${types}`;
+  const response = await api.get(`user/products/${query}`);
+  return response.data;
+};
+
+export const infiniteProductsQuery = (
+  categories: string | null = null,
+  types: string | null = null,
+) => ({
+  queryKey: [
+    "products",
+    "infinite",
+    categories ?? undefined,
+    types ?? undefined,
+  ],
+  queryFn: ({ pageParam }: { pageParam?: number | null }) =>
+    fetchInfiniteProducts({ pageParam, categories, types }),
+  placeholder: keepPreviousData,
+  initialPageParam: null,
+  getNextPageParam: (lastPage, pages) => lastPage.nextCursor ?? undefined,
+});
+
+const fetchCategoryType = () => {
+  return api.get("user/filter-type").then((res) => res.data);
+};
+
+export const categoryTypeQuery = () => ({
+  queryKey: ["category", "type"],
+  queryFn: fetchCategoryType,
+});
+
+const fetchOneProduct = async (id: number) => {
+  const product = await api.get(`user/products/${id}`);
+  if (!product) {
+    throw new Response("", {
+      status: 404,
+      statusText: "Not Found",
+    });
+  }
+  return product.data;
+};
+
+export const oneProductQuery = (id: number) => ({
+  queryKey: ["products", "detail", id],
+  queryFn: () => fetchOneProduct(id),
 });

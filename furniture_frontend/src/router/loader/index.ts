@@ -1,7 +1,11 @@
-import { redirect } from "react-router";
+import { redirect, type LoaderFunctionArgs } from "react-router";
 import { authApi } from "../../api";
 import useAuthStore, { Status } from "@/store/authStore";
 import {
+  categoryTypeQuery,
+  infiniteProductsQuery,
+  onePostQuery,
+  oneProductQuery,
   postInfiniteQuery,
   postQuery,
   productQuery,
@@ -60,4 +64,28 @@ export const confirmLoader = async () => {
 export const blogInfiniteLoader = async () => {
   await queryClient.ensureInfiniteQueryData(postInfiniteQuery());
   return null;
+};
+
+export const postDetailLoader = async ({ params }: LoaderFunctionArgs) => {
+  if (!params.postId) {
+    throw new Error("No Post Id is provided");
+  }
+  await queryClient.ensureQueryData(postQuery("?limit=6"));
+  await queryClient.ensureQueryData(onePostQuery(Number(params.postId)));
+  return { productId: params.postId };
+};
+
+export const productInfiniteLoader = async () => {
+  await queryClient.ensureQueryData(categoryTypeQuery());
+  await queryClient.prefetchInfiniteQuery(infiniteProductsQuery());
+  return null;
+};
+
+export const productDetailLoader = async ({ params }: LoaderFunctionArgs) => {
+  if (!params.productId) {
+    throw new Error("No Product Id is provided");
+  }
+  await queryClient.ensureQueryData(productQuery("?limit=6"));
+  await queryClient.ensureQueryData(oneProductQuery(Number(params.productId)));
+  return { productId: params.productId };
 };

@@ -11,13 +11,26 @@ import {
 import { AspectRatio } from "../ui/aspect-ratio";
 import { Link } from "react-router";
 import { formatPrice, cn } from "../../lib/utils";
+import { useCartStore } from "@/store/cartStore";
 
 interface productProps extends React.HTMLAttributes<HTMLDivElement> {
-  products: Products;
+  products: Product;
 }
 const imageUrl = import.meta.env.VITE_IMG_URL;
 
 function ProductCard({ products, className }: productProps) {
+  const { carts, addItem } = useCartStore();
+  const cartItem = carts.find((item) => item.id === products.id);
+
+  const handleAddToCart = () => {
+    addItem({
+      id: products.id,
+      name: products.name,
+      price: products.price,
+      quantity: 1,
+      image: products.images[0].path,
+    });
+  };
   return (
     <Card className={cn("size-full overflow-hidden rounded-lg", className)}>
       <Link to={`/products/${products.id}`} aria-label={products.name}>
@@ -28,6 +41,7 @@ function ProductCard({ products, className }: productProps) {
               alt=""
               className="size-full object-cover"
               loading="lazy"
+              decoding="async"
             />
           </AspectRatio>
         </CardHeader>
@@ -44,7 +58,7 @@ function ProductCard({ products, className }: productProps) {
         </CardContent>
       </Link>
       <CardFooter className="p-4 pt-1">
-        {products.status === "sold" ? (
+        {products.status === "INACTIVE" ? (
           <Button
             size="sm"
             disabled={true}
@@ -58,8 +72,10 @@ function ProductCard({ products, className }: productProps) {
             size="sm"
             className="bg-main h-8 w-full rounded-sm font-bold"
             aria-label="Add to Cart"
+            onClick={handleAddToCart}
+            disabled={!!cartItem}
           >
-            Add to Cart
+            {!cartItem ? "Add to Cart" : "Added Item"}
           </Button>
         )}
       </CardFooter>

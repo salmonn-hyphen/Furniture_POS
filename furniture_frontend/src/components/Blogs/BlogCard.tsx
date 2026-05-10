@@ -16,6 +16,8 @@ export default function BlogCard({ posts }: PostProps) {
               src={imageUrl + post.image}
               alt="Blog Image"
               className="mb-4 w-full rounded-2xl"
+              loading="lazy"
+              decoding="async"
             />
             <h3 className="ml-4 line-clamp-1 font-semibold">{post.title}</h3>
             <div className="mt-2 ml-4 text-sm">

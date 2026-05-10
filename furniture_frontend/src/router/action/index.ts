@@ -2,6 +2,7 @@ import useAuthStore, { Status } from "@/store/authStore";
 import api, { authApi } from "../../api";
 import { AxiosError } from "axios";
 import { redirect, type ActionFunctionArgs } from "react-router";
+import { queryClient } from "@/api/query";
 export const loginAction = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const credentials = Object.fromEntries(formData);
@@ -91,5 +92,32 @@ export const confirmAction = async ({ request }: ActionFunctionArgs) => {
         return { error: error.response?.data.message };
       }
     } else throw error;
+  }
+};
+
+export const favoriteAction = async ({
+  request,
+  params,
+}: ActionFunctionArgs) => {
+  const formData = await request.formData();
+  if (!params.productId) {
+    throw new Error("No Product ID is provided");
+  }
+  const data = {
+    productId: Number(params.productId),
+    favorite: formData.get("favorite") === "true",
+  };
+  try {
+    await api.patch("user/products/toggle-favorite", data);
+
+    await queryClient.invalidateQueries({
+      queryKey: ["products", "detail", params.productId],
+    });
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      if (error.response) {
+        return { error: error.response.data.message };
+      }
+    }
   }
 };

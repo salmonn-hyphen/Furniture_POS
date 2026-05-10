@@ -13,6 +13,7 @@ import Login from "./components/Auth/Login";
 import SignUp from "./pages/Auth/SignUp";
 import {
   confirmAction,
+  favoriteAction,
   loginAction,
   logoutAction,
   otpAction,
@@ -24,6 +25,8 @@ import {
   homeLoader,
   loginLoader,
   otpLoader,
+  postDetailLoader,
+  productDetailLoader,
   signupLoader,
 } from "./router/loader";
 import AuthRootLayout from "./pages/Auth/AuthRootLayout";
@@ -43,7 +46,7 @@ export const router = createBrowserRouter([
         Component: BlogRootLayout,
         children: [
           { index: true, Component: Blog, loader: blogInfiniteLoader },
-          { path: ":postId", Component: BlogDetail },
+          { path: ":postId", Component: BlogDetail, loader: postDetailLoader },
         ],
       },
       {
@@ -51,7 +54,12 @@ export const router = createBrowserRouter([
         Component: ProductRootLayout,
         children: [
           { index: true, Component: Product },
-          { path: ":productId", Component: ProductDetail },
+          {
+            path: ":productId",
+            Component: ProductDetail,
+            loader: productDetailLoader,
+            action: favoriteAction,
+          },
         ],
       },
     ],

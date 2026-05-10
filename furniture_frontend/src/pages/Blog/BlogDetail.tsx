@@ -1,13 +1,16 @@
 import { Icons } from "../../components/logo";
-import { Link, useParams } from "react-router";
-import { Posts } from "../../data/posts";
+import { Link, useLoaderData } from "react-router";
 import { Button } from "../../components/ui/button";
 import PurifyRenderer from "../../components/Blogs/PurifyRenderer";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { onePostQuery, postQuery } from "@/api/query";
+import type { Post, Tag } from "@/types";
 
+const imgUrl = import.meta.env.IMG_URL;
 function BlogDetail() {
-  const { postId } = useParams();
-  const post = Posts.find((post) => post.id === postId);
-
+  const { postId } = useLoaderData();
+  const { data: postData } = useSuspenseQuery(postQuery("?limit=6"));
+  const { data: postDetail } = useSuspenseQuery(onePostQuery(postId));
   return (
     <div className="container mx-auto px-4 lg:px-0">
       <section className="flex flex-col lg:flex-row">
@@ -18,21 +21,39 @@ function BlogDetail() {
               All Posts
             </Link>
           </Button>
-          {post ? (
+          {postDetail ? (
             <>
-              <h2 className="mb-3 text-3xl font-extrabold">{post.title}</h2>
+              <h2 className="mb-3 text-3xl font-extrabold">
+                {postDetail.post.title}
+              </h2>
               <div className="mb-4 text-sm">
                 <span>
-                  by <span className="font-[600]"> {post.author} </span>
-                  on <span className="font-[600]"> {post.updated_at} </span>
+                  by{" "}
+                  <span className="font-[600]">
+                    {" "}
+                    {postDetail.post.author.fullName}{" "}
+                  </span>
+                  on{" "}
+                  <span className="font-[600]">
+                    {" "}
+                    {postDetail.post.updatedAt}{" "}
+                  </span>
                 </span>
               </div>
-              <h3 className="my-6 text-base font-[400]">{post.content}</h3>
-              <img src={post.image} alt="" className="w-full rounded-xl" />
-              <PurifyRenderer content={post.body} className="my-8" />
+              <h3 className="my-6 text-base font-[400]">
+                {postDetail.post.content}
+              </h3>
+              <img
+                src={imgUrl + postDetail.post.image}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="w-full rounded-xl"
+              />
+              <PurifyRenderer content={postDetail.post.body} className="my-8" />
               <div className="mb-12 space-x-2">
-                {post.tags.map((tag) => (
-                  <Button variant="secondary">{tag}</Button>
+                {postDetail.post.tags.map((tag: Tag) => (
+                  <Button variant="secondary">{tag.name}</Button>
                 ))}
               </div>
             </>
@@ -48,19 +69,21 @@ function BlogDetail() {
             <h3 className="">Other Blog Posts</h3>
           </div>
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1">
-            {Posts.map((posts) => (
+            {postData.map((post: Post) => (
               <Link
-                key={posts.id}
-                to={`/blogs/${posts.id}`}
+                key={post.id}
+                to={`/blogs/${post.id}`}
                 className="mb-6 flex items-start gap-2"
               >
                 <img
-                  src={posts.image}
-                  alt={posts.title}
+                  src={imgUrl + post.image}
+                  alt={post.title}
+                  loading="lazy"
+                  decoding="async"
                   className="w-1/4 rounded"
                 />
                 <div className="text-muted-foreground w-3/4 text-sm font-[500]">
-                  <p className="line-clamp-2">{posts.content}</p>
+                  <p className="line-clamp-2">{post.content}</p>
                   <i className="">...see more</i>
                 </div>
               </Link>

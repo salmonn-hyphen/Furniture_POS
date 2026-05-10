@@ -15,8 +15,10 @@ import {
   getPostsByPagination,
 } from "../../../controllers/apiControllers/postController";
 import {
+  getCategoryType,
   getProducts,
   getProductsByPagination,
+  toggleFavorite,
 } from "../../../controllers/apiControllers/productController";
 
 const router = express.Router();
@@ -47,4 +49,10 @@ router.get("/posts/:id", auth, getPost);
 //Routes for get product details
 router.get("/products/:id", auth, getProducts);
 router.get("/products", auth, getProductsByPagination);
+
+//Routes for get categories and tags
+router.get("/filter-type", auth, getCategoryType);
+
+//Route for toggle favorite
+router.patch("/products/toggle-favorite",auth,toggleFavorite)
 export default router;
