@@ -13,6 +13,7 @@ import {
   verifyOtpForPassword,
 } from "../../controllers/forgetPasswordController";
 import { auth } from "../../middlewares/auth";
+import { changePassword } from "../../controllers/changePassword";
 
 const router = express.Router();
 
@@ -25,6 +26,9 @@ router.post("/logout", logout);
 router.post("/forget-password", forgetPassword);
 router.post("/verify", verifyOtpForPassword);
 router.post("/reset-password", resetPassword);
+
+router.post("/change-password", auth, changePassword);
+
 
 //auth check
 router.get("/auth-check", auth, authCheck);

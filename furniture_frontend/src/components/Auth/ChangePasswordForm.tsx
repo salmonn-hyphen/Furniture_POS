@@ -14,12 +14,20 @@ import { PasswordInput } from "../../components/Auth/PasswordInput";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useSubmit, useNavigation } from "react-router";
+import { useSubmit, useNavigation, useActionData } from "react-router";
 import { Spinner } from "../ui/spinner";
 
-const passwordSchema = z
+const changePasswordSchema = z
   .object({
-    password: z
+    currentPassword: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(8, "Password must be  8 characters")
+      .regex(
+        /[!@#$%^&*(),.?":{}|<>]/,
+        "Password must contain at least one special character",
+      ),
+    newPassword: z
       .string()
       .min(8, "Password must be at least 8 characters")
       .max(8, "Password must be  8 characters")
@@ -28,28 +36,35 @@ const passwordSchema = z
         "Password must contain at least one special character",
       ),
 
-    confirmPassword: z.string(),
+    reTypePassword: z.string(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine((data) => data.newPassword === data.reTypePassword, {
     message: "Passwords do not match",
-    path: ["confirmPassword"], // error shows on confirmPassword field
+    path: ["reTypePassword"], // error shows on reTypePassword field
+  })
+  .refine((data) => data.newPassword !== data.currentPassword, {
+    message: "New password must be different from current password",
+    path: ["newPassword"],
   });
 
-export default function ConfirmPassword({
+export default function ChangePasswordForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const submit = useSubmit();
   const navigation = useNavigation();
-  const form = useForm<z.infer<typeof passwordSchema>>({
-    resolver: zodResolver(passwordSchema),
+  const actionData = useActionData() as { error?: string; message?: string };
+
+  const form = useForm<z.infer<typeof changePasswordSchema>>({
+    resolver: zodResolver(changePasswordSchema),
     defaultValues: {
-      password: "",
-      confirmPassword: "",
+      currentPassword: "",
+      newPassword: "",
+      reTypePassword: "",
     },
   });
-  function onSubmit(values: z.infer<typeof passwordSchema>) {
-    submit(values, { method: "POST", action: "/signup/confirm-password" });
+  function onSubmit(values: z.infer<typeof changePasswordSchema>) {
+    submit(values, { method: "POST", action: "/change-password" });
   }
   return (
     <div
@@ -61,9 +76,9 @@ export default function ConfirmPassword({
           <div className="p-6 md:p-8 lg:p-10">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
-                <h1 className="text-2xl font-bold">Confirm New Password</h1>
+                <h1 className="text-2xl font-bold">Change Password</h1>
                 <p className="text-muted-foreground text-balance">
-                  Enter and confirm your new password
+                  Enter your current password and a new password
                 </p>
               </div>
               <Form {...form}>
@@ -73,7 +88,30 @@ export default function ConfirmPassword({
                 >
                   <FormField
                     control={form.control}
-                    name="password"
+                    name="currentPassword"
+                    render={({ field }) => (
+                      <FormItem className="relative space-y-0">
+                        <FormLabel>Current Password</FormLabel>
+                        <FormLabel className="sr-only">
+                          Current Password
+                        </FormLabel>
+                        <FormControl>
+                          <PasswordInput
+                            placeholder="Enter current password"
+                            required
+                            className="pr-12"
+                            {...field}
+                          />
+                        </FormControl>
+                        <div className="min-h-3">
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="newPassword"
                     render={({ field }) => (
                       <FormItem className="relative space-y-0">
                         <FormLabel>New Password</FormLabel>
@@ -94,16 +132,16 @@ export default function ConfirmPassword({
                   />
                   <FormField
                     control={form.control}
-                    name="confirmPassword"
+                    name="reTypePassword"
                     render={({ field }) => (
                       <FormItem className="relative space-y-0">
-                        <FormLabel>Confirm Password</FormLabel>
+                        <FormLabel>Re-type Password</FormLabel>
                         <FormLabel className="sr-only">
-                          Confirm Password
+                          Re-type Password
                         </FormLabel>
                         <FormControl>
                           <PasswordInput
-                            placeholder="Re-enter password"
+                            placeholder="Re-enter new password"
                             required
                             className="pr-12"
                             {...field}
@@ -115,16 +153,15 @@ export default function ConfirmPassword({
                       </FormItem>
                     )}
                   />
+                  {actionData?.error && (
+                    <p className="text-sm text-red-500">{actionData.error}</p>
+                  )}
                   <Button
                     type="submit"
                     className="mt-2"
                     disabled={navigation.state === "submitting"}
                   >
-                    {navigation.state === "submitting" ? (
-                      <Spinner />
-                    ) : (
-                      "Confirm Password"
-                    )}
+                    {navigation.state === "submitting" ? <Spinner /> : "Change"}
                   </Button>
                 </form>
               </Form>

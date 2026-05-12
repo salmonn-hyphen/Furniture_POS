@@ -12,26 +12,37 @@ import ProductDetail from "./pages/Products/ProductDetail";
 import Login from "./components/Auth/Login";
 import SignUp from "./pages/Auth/SignUp";
 import {
+  changePasswordAction,
   confirmAction,
   favoriteAction,
   loginAction,
   logoutAction,
+  newPasswordAction,
   otpAction,
   registerAction,
+  resetAction,
+  verifyAction,
 } from "./router/action";
 import {
   blogInfiniteLoader,
+  changePasswordLoader,
   confirmLoader,
   homeLoader,
   loginLoader,
+  newPasswordLoader,
   otpLoader,
   postDetailLoader,
   productDetailLoader,
   signupLoader,
+  verifyLoader,
 } from "./router/loader";
 import AuthRootLayout from "./pages/Auth/AuthRootLayout";
 import OtpVerify from "./pages/Auth/OtpVerify";
 import ConfirmPassword from "./pages/Auth/ConfirmPassword";
+import ResetPassword from "./pages/Auth/ResetPassword";
+import ResetOtpVerify from "./pages/Auth/ResetOtpVerify";
+import NewPassword from "./pages/Auth/NewPassword";
+import ChangePassword from "./pages/ChangePassword";
 
 export const router = createBrowserRouter([
   {
@@ -61,6 +72,12 @@ export const router = createBrowserRouter([
             action: favoriteAction,
           },
         ],
+      },
+      {
+        path: "/change-password",
+        Component: ChangePassword,
+        action: changePasswordAction,
+        loader: changePasswordLoader,
       },
     ],
   },
@@ -98,5 +115,28 @@ export const router = createBrowserRouter([
     path: "/logout",
     action: logoutAction,
     loader: () => redirect("/"),
+  },
+  {
+    path: "/reset",
+    Component: AuthRootLayout,
+    children: [
+      {
+        index: true,
+        Component: ResetPassword,
+        action: resetAction,
+      },
+      {
+        path: "verify",
+        Component: ResetOtpVerify,
+        loader: verifyLoader,
+        action: verifyAction,
+      },
+      {
+        path: "new-password",
+        Component: NewPassword,
+        action: newPasswordAction,
+        loader: newPasswordLoader,
+      },
+    ],
   },
 ]);

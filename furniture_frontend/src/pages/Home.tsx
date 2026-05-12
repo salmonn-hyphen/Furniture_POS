@@ -5,7 +5,7 @@ import CarouselComponent from "../components/Products/CarouselComponent";
 import BlogCard from "../components/Blogs/BlogCard";
 import ProductCard from "../components/Products/ProductCard";
 import { postQuery, productQuery } from "../api/query";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import type { Product } from "@/types";
 
 function Home() {

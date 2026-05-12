@@ -61,6 +61,32 @@ export const confirmLoader = async () => {
   return null;
 };
 
+export const verifyLoader = async () => {
+  const authStore = useAuthStore.getState();
+  if (authStore.status !== Status.verify) {
+    return redirect("/reset");
+  }
+  return null;
+};
+
+export const newPasswordLoader = async () => {
+  const authStore = useAuthStore.getState();
+  if (authStore.status !== Status.reset) {
+    return redirect("/reset");
+  }
+  return null;
+};
+
+export const changePasswordLoader = async () => {
+  try {
+    await authApi.get("auth-check");
+    return null;
+  } catch (error) {
+    console.log(error);
+    return redirect("/signin");
+  }
+};
+
 export const blogInfiniteLoader = async () => {
   await queryClient.ensureInfiniteQueryData(postInfiniteQuery());
   return null;

@@ -17,7 +17,7 @@ import { z } from "zod";
 import { useSubmit, useNavigation } from "react-router";
 import { Spinner } from "../ui/spinner";
 
-const passwordSchema = z
+const newPasswordSchema = z
   .object({
     password: z
       .string()
@@ -35,21 +35,21 @@ const passwordSchema = z
     path: ["confirmPassword"], // error shows on confirmPassword field
   });
 
-export default function ConfirmPassword({
+export default function NewPasswordForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const submit = useSubmit();
   const navigation = useNavigation();
-  const form = useForm<z.infer<typeof passwordSchema>>({
-    resolver: zodResolver(passwordSchema),
+  const form = useForm<z.infer<typeof newPasswordSchema>>({
+    resolver: zodResolver(newPasswordSchema),
     defaultValues: {
       password: "",
       confirmPassword: "",
     },
   });
-  function onSubmit(values: z.infer<typeof passwordSchema>) {
-    submit(values, { method: "POST", action: "/signup/confirm-password" });
+  function onSubmit(values: z.infer<typeof newPasswordSchema>) {
+    submit(values, { method: "POST", action: "/reset/new-password" });
   }
   return (
     <div
@@ -120,11 +120,7 @@ export default function ConfirmPassword({
                     className="mt-2"
                     disabled={navigation.state === "submitting"}
                   >
-                    {navigation.state === "submitting" ? (
-                      <Spinner />
-                    ) : (
-                      "Confirm Password"
-                    )}
+                    {navigation.state === "submitting" ? <Spinner /> : "Change"}
                   </Button>
                 </form>
               </Form>

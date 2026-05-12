@@ -111,7 +111,7 @@ export default function LoginForm({
                           <FormLabel>Password</FormLabel>
                           <FormLabel className="sr-only">Password</FormLabel>
                           <Link
-                            to="#"
+                            to="/reset"
                             className="ml-auto text-sm underline-offset-4 hover:underline"
                           >
                             Forgot your password?

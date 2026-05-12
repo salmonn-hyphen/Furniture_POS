@@ -25,11 +25,17 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { oneProductQuery, productQuery } from "@/api/query";
 import type { Image, Product } from "@/types";
 import { useCartStore } from "@/store/cartStore";
+
 const imageUrl = import.meta.env.VITE_IMG_URL;
 
 function ProductDetail() {
   const navigate = useNavigate();
   const { productId } = useLoaderData();
+
+  //click back button to go the products list page with last filtered lists
+  const lastFilters = sessionStorage.getItem("products:last-filters");
+  const backTo = lastFilters ? `/products?${lastFilters}` : "/products";
+
   const { data: productData } = useSuspenseQuery(productQuery("?limit=4"));
   const { data: productDetail } = useSuspenseQuery(oneProductQuery(productId));
 
@@ -51,7 +57,11 @@ function ProductDetail() {
 
   return (
     <div className="container mx-auto px-4 md:px-0">
-      <Button variant="outline" className="mt-8" onClick={() => navigate(-1)}>
+      <Button
+        variant="outline"
+        className="mt-8"
+        onClick={() => navigate(backTo)}
+      >
         <Icons.arrowLeft /> All Products
       </Button>
       <section className="my-6 flex flex-col gap-16 md:flex-row md:gap-16">

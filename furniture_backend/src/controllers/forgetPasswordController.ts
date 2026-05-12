@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { body, validationResult } from "express-validator";
 import {
+  createOtp,
   getOtpByPhone,
   getUserByPhone,
   updateOtp,
@@ -33,12 +34,15 @@ export const forgetPassword = [
       error.code = "Error Invalid";
       return next(error);
     }
-    let phone = req.body.phone;
-    if (phone.slice(0, 2) === "09") {
-      phone = phone.substring(2, phone.length);
-    }
-    const user = await getUserByPhone(phone);
+    const rawPhone = req.body.phone;
+    const normalizedPhone = rawPhone.startsWith("09")
+      ? rawPhone.substring(2, rawPhone.length)
+      : rawPhone;
+    const user =
+      (await getUserByPhone(rawPhone)) ??
+      (await getUserByPhone(normalizedPhone));
     checkUserIfNotExist(user);
+    const phone = user!.phone;
 
     const otp = 123456;
     // const generateOTP();
@@ -48,36 +52,47 @@ export const forgetPassword = [
 
     const otpInfo = await getOtpByPhone(phone);
     let result;
-    const lastRequestOtp = new Date(otpInfo!.updatedAt).toLocaleDateString();
-    const today = new Date().toLocaleDateString();
-    const isSameDate = lastRequestOtp === today;
-    checkErrorIfSameDate(isSameDate, otpInfo!.error);
-    if (!isSameDate) {
+    if (!otpInfo) {
       const otpData = {
+        phone,
         otp: hashedOtp,
         rememberToken: token,
         count: 1,
         error: 0,
       };
-      result = await updateOtp(otpInfo!.id, otpData);
+      result = await createOtp(otpData);
     } else {
-      //If the request is the same date and over limit
-      if (otpInfo!.count === 3) {
-        const error: any = new Error(
-          "Allowed to request OTP 3 times per a day, Try Later"
-        );
-        error.status = 409;
-        error.code = "Error_OverLimit";
-        throw error;
-      } else {
+      const lastRequestOtp = new Date(otpInfo.updatedAt).toLocaleDateString();
+      const today = new Date().toLocaleDateString();
+      const isSameDate = lastRequestOtp === today;
+      checkErrorIfSameDate(isSameDate, otpInfo.error);
+      if (!isSameDate) {
         const otpData = {
           otp: hashedOtp,
           rememberToken: token,
-          count: {
-            increment: 1,
-          },
+          count: 1,
+          error: 0,
         };
-        result = await updateOtp(otpInfo!.id, otpData);
+        result = await updateOtp(otpInfo.id, otpData);
+      } else {
+        //If the request is the same date and over limit
+        if (otpInfo.count === 3) {
+          const error: any = new Error(
+            "Allowed to request OTP 3 times per a day, Try Later",
+          );
+          error.status = 409;
+          error.code = "Error_OverLimit";
+          throw error;
+        } else {
+          const otpData = {
+            otp: hashedOtp,
+            rememberToken: token,
+            count: {
+              increment: 1,
+            },
+          };
+          result = await updateOtp(otpInfo.id, otpData);
+        }
       }
     }
     res.status(200).json({
@@ -108,7 +123,7 @@ export const verifyOtpForPassword = [
       error.code = "Error_Invalid";
     }
     const { phone, otp, token } = req.body;
-    const user = getUserByPhone(phone);
+    const user = await getUserByPhone(phone);
     checkUserIfNotExist(user);
     const otpInfo = await getOtpByPhone(phone);
 
@@ -201,7 +216,7 @@ export const resetPassword = [
     //If error is overlimit, user cannot reach this stage
     if (otpInfo?.error == 5) {
       return next(
-        createError("This request may be an attack", 400, errorCode.attack)
+        createError("This request may be an attack", 400, errorCode.attack),
       );
     }
     //check verify token is match
@@ -219,8 +234,8 @@ export const resetPassword = [
         createError(
           "Your Request is expired, try again",
           403,
-          errorCode.requestExpired
-        )
+          errorCode.requestExpired,
+        ),
       );
     }
     const salt = await bcrypt.genSalt(10);
@@ -234,14 +249,14 @@ export const resetPassword = [
       process.env.ACCESS_TOKEN_SECRET!,
       {
         expiresIn: 60 * 15,
-      }
+      },
     );
     const refreshToken = jwt.sign(
       refreshPayload,
       process.env.REFRESH_TOKEN_SECRET!,
       {
         expiresIn: "30days",
-      }
+      },
     );
     const userUpdateData = {
       password: hashedPassword,

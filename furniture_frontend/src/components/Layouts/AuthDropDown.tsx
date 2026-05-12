@@ -32,6 +32,8 @@ function AuthDropDown({ user }: userProps) {
     );
   }
 
+  const imageUrl = import.meta.env.VITE_IMG_URL;
+
   const initialName = `${user.firstName.charAt(0) ?? ""}${user.lastName.charAt(0) ?? ""}`;
 
   return (
@@ -39,7 +41,7 @@ function AuthDropDown({ user }: userProps) {
       <DropdownMenuTrigger asChild>
         <Button variant="secondary" className="size-8 rounded-full">
           <Avatar>
-            <AvatarImage src={user.image} />
+            <AvatarImage src={imageUrl + user.imageUrl} />
             <AvatarFallback>{initialName}</AvatarFallback>
           </Avatar>
         </Button>
@@ -70,6 +72,13 @@ function AuthDropDown({ user }: userProps) {
               <Icons.gear className="aria-hidden: mr-2 size-4" />
               Setting
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/change-password">
+              <Icons.lockClose className="aria-hidden: mr-2 size-4" />
+              Change Password
+              <DropdownMenuShortcut>⌘C</DropdownMenuShortcut>
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>

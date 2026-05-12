@@ -36,7 +36,7 @@ export const register = [
     }
 
     let phone = req.body.phone;
-    if (phone.slice(0.2) == "09") {
+    if (phone.startsWith("09")) {
       phone = phone.substring(2, phone.length);
     }
     const user = await getUserByPhone(phone);

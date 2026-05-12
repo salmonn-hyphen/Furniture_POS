@@ -4,15 +4,37 @@ import ProductCard from "../../components/Products/ProductCard";
 import {
   categoryTypeQuery,
   infiniteProductsQuery,
-  queryClient,
+  //queryClient,
 } from "@/api/query";
 import { Button } from "@/components/ui/button";
 import { useSearchParams } from "react-router";
+import { useEffect } from "react";
 
 function Product() {
   const [searchParams, setSearchParams] = useSearchParams();
   const rawCategory = searchParams.get("categories");
   const rawType = searchParams.get("types");
+
+  const lastFilterKey = "products:last-filters";
+
+  //if the URL has no param , it loads the last filters from sessionStorage
+  useEffect(() => {
+    if (!rawCategory && !rawType) {
+      const storedFilters = sessionStorage.getItem(lastFilterKey);
+      if (storedFilters) {
+        setSearchParams(new URLSearchParams(storedFilters), {
+          replace: true,
+        });
+      }
+    }
+  }, [rawCategory, rawType, setSearchParams]);
+
+  //if the URL has filters, it is saved into sessionStorage
+  useEffect(() => {
+    if (rawCategory || rawType) {
+      sessionStorage.setItem(lastFilterKey, searchParams.toString());
+    }
+  }, [rawCategory, rawType, searchParams]);
 
   const selectedCategory = rawCategory
     ? decodeURIComponent(rawCategory)
@@ -42,7 +64,7 @@ function Product() {
     isFetchingNextPage,
     fetchNextPage,
     hasNextPage,
-    refetch,
+    // refetch,
   } = useInfiniteQuery(infiniteProductsQuery(category, type));
 
   const allProducts = data?.pages.flatMap((page) => page.products) ?? [];
@@ -53,13 +75,21 @@ function Product() {
       newParams.set("categories", encodeURIComponent(categories.join(",")));
     if (types.length > 0)
       newParams.set("types", encodeURIComponent(types.join(",")));
-    //Update URL and triggers refetch via query
+    //Update URL 
     setSearchParams(newParams);
+
+    //add the  Filter Param to the session Storage if exists, and remove if not
+    if (newParams.toString()) {
+      sessionStorage.setItem(lastFilterKey, newParams.toString());
+    } else {
+      sessionStorage.removeItem(lastFilterKey);
+    }
+
     //Cancel In-flight queries
-    queryClient.cancelQueries({ queryKey: ["products", "infinite"] });
+    //queryClient.cancelQueries({ queryKey: ["products", "infinite"] });
     //clear cache
-    queryClient.removeQueries({ queryKey: ["products", "infinite"] });
-    refetch();
+    //queryClient.removeQueries({ queryKey: ["products", "infinite"] });
+    //refetch();
   };
 
   return status === "pending" ? (

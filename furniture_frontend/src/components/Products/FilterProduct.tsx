@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Checkbox } from "../ui/checkbox";
@@ -42,6 +43,15 @@ export default function FilterProduct({
       types: selectedType,
     },
   });
+  
+  //remains the same with filter list
+  useEffect(() => {
+    form.reset({
+      categories: selectedCategory,
+      types: selectedType,
+    });
+  }, [form, selectedCategory, selectedType]);
+
   function onSubmit(data: z.infer<typeof FormSchema>) {
     handleFilterChange(data.categories, data.types);
   }
@@ -74,8 +84,11 @@ export default function FilterProduct({
                                 item.id.toString(),
                               )}
                               onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([...field.value, item.id.toString()])
+                                return checked
+                                  ? field.onChange([
+                                      ...field.value,
+                                      item.id.toString(),
+                                    ])
                                   : field.onChange(
                                       field.value?.filter(
                                         (value) => value !== item.id.toString(),
@@ -121,8 +134,11 @@ export default function FilterProduct({
                                 item.id.toString(),
                               )}
                               onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([...field.value, item.id.toString()])
+                                return checked
+                                  ? field.onChange([
+                                      ...field.value,
+                                      item.id.toString(),
+                                    ])
                                   : field.onChange(
                                       field.value?.filter(
                                         (value) => value !== item.id.toString(),

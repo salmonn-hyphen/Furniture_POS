@@ -8,6 +8,7 @@ export const Status = {
   verify: "verify",
   reset: "reset",
   none: "none",
+  change: "change",
 } as const;
 
 export type Status = (typeof Status)[keyof typeof Status];

@@ -13,6 +13,7 @@ import {
   GearIcon,
   ExitIcon,
   TrashIcon,
+  LockClosedIcon,
 } from "@radix-ui/react-icons";
 export type IconProps = React.HTMLAttributes<SVGElement>;
 export const Icons = {
@@ -65,4 +66,5 @@ export const Icons = {
   exit: ExitIcon,
   cart: ShoppingCart,
   trash: TrashIcon,
+  lockClose: LockClosedIcon,
 };
